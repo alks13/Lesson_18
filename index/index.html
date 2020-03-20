@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Star Wars</title>
+</head>
+
+<style>
+    .hidden {
+  display:none;
+}
+</style>
+
+<body>
+<div class="main">
+<h4>Список фильмов</h4>
+<ul class="movie"></ul>
+</div>
+
+<script>
+  
+const xhr = new XMLHttpRequest;
+xhr.open('GET', 'https://swapi.co/api/films/');
+xhr.responseType = 'json';
+xhr.send();
+const SUCCESS_STATUS = 200;
+function XHR() {
+    if(xhr.status !== 200){
+        alert('Error ' + xhr.status);
+        return;
+    }
+    
+const list = document.querySelector('.movie');
+const movies = xhr.response.results;
+movies.forEach(movie => {
+    const TitleMovie  = movie.title;
+    const li = document.createElement('li');
+     li.classList.add('collap_title');
+    li.textContent = TitleMovie;
+
+list.append(li);
+});
+
+ document.querySelector('.movie').addEventListener('click', event => {
+
+        const {target} = event;
+        if(!target.classList.contains('collap_title')) return;
+
+        if(target.firstElementChild) {
+            target.firstElementChild.classList.toggle('hidden');
+            return;
+        }
+
+        const ships = movies.find( movie => movie.title === target.textContent).starships;
+        const shipsUl = document.createElement('ul');
+
+        ships.forEach( ship => {
+            const shipXHR = new XMLHttpRequest;
+            shipXHR.open('GET', ship);
+            shipXHR.responseType = 'json';
+            shipXHR.send();
+
+            const shipLi = document.createElement('li');
+            shipXHR.onload = function() {
+
+                shipLi.textContent = shipXHR.response.name;
+                shipLi.classList.add('ship');
+                shipsUl.append(shipLi);
+            };
+        });
+
+        target.append(shipsUl);
+    });
+}
+
+
+xhr.onload = XHR;
+
+</script>
+</body>
+</html>
